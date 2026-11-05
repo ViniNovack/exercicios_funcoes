@@ -45,7 +45,32 @@ group by c.id, c.nome_curso
 order by matriculados desc;
 
 -- Exiba, para cada cidade, quantos alunos residem nela. Ordene do maior para o menor
+select cidade, count(*) as total from aluno
+group by cidade
+order by total desc;
+
 -- Mostre o nome dos alunos que NÃO possuem nenhuma matrícula com status "Ativa"
+select a.nome from aluno as a
+join matricula as m on a.id = m.id_aluno
+where m.status not like 'ativa';
+
 -- Liste o nome dos cursos que não possuem nenhuma turma cadastrada
+select c.nome_curso from curso as c
+left join turma as t on c.id = t.id_curso
+where t.id is null;
+
 -- Liste os professores que ministram mais de uma turma, mostrando o nome e a quantidade de turmas
--- [DESAFIO] Liste os alunos que possuem matrícula ativa simultaneamente em turmas de "Biologia" e de "Matemática".
+select p.nome, count(t.id) as turmas from professor as p
+join turma as t on p.id = t.id_professor
+group by t.id
+having turmas > 1
+order by turmas desc;
+
+-- [DESAFIO] Liste os alunos que possuem matrícula ativa simultaneamente em turmas de "Biologia" e de "Matemática"
+select a.nome from aluno as a
+join matricula as m on a.id = m.id_aluno
+join turma as t on m.id_turma = t.id
+join curso as c on t.id_curso = c.id
+where m.status like 'Ativo' and c.nome_curso in ('Biologia', 'Matemática')
+group by a.id, a.nome
+having count(distinct c.nome_curso) = 2;
